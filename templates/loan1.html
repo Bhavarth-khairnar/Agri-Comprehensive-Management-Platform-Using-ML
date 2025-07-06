@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+{% block title %}Loans{% endblock title %}
+{% block body %}
+<div class="container-fluide">
+    <div class="row">
+        <div class="col-lg-3  bg-light d-none d-md-block sidebar">
+            <div class="mb-1" style="background-color: rgb(245,222,179); height:595px;">
+                <div class="text-center"> <br><br>
+                    <img src="/static/images/farmer_icon.png" alt="avatar" class="rounded-circle img-fluid"
+                            style="width: 100px; margin-top: 30px;">
+                            <h1 class="mt-0 mb-3" style="color:rgb(0, 0, 0);"> {{first_name}} {{last_name}} </h1>
+                            <hr color="black">
+    
+                    <li>
+                        <h3><i class="basicinfo"></i><a href="dashboard" style="color: rgb(0, 0, 0);">Home</a></h3>
+                    </li><hr color="black">
+                    <li>
+                        <h3><i class="Crop_Pre"></i><a href="crop_prediction" style="color:rgb(6, 2, 2);">Crop Prediction</a></h3>
+                    </li>
+                    <hr color="black">
+                    <li>
+                        <h3><i class="Crop_Dis"></i><a href="crop_dis" style="color:rgb(5, 1, 1);">Crop Disease</a></h3>
+                    </li>
+                    <hr color="black">
+                    <li>
+                        <h3><i class="Crop_Dis"></i><a href="fert_rec" style="color:rgb(5, 1, 1);">Fertilizer Recommendation</a></h3>
+                    </li>
+                    <hr color="black">
+                    <div class="dropdown">
+                        <button class="btn btn-secondary dropdown-toggle" style="background-color: hsl(182, 48%, 28%)"
+                            type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true"
+                            aria-expanded="false">
+                            Basic Information
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            <a class="dropdown-item"
+                                href="https://krishi.maharashtra.gov.in/Site/Information/DisplayGuideLines.aspx?MenuID=1143">Government
+                                Yojna</a>
+                            <a class="dropdown-item" href="loan1">Loans</a>
+                            <a class="dropdown-item" href="insurance">Insurance</a>
+                        </div>
+                    </div>
+                    <hr color="black">
+                    <li><h3><i class="Crop_Pre"></i><a href="news" style="color:rgb(6, 2, 2);">News</a></h3></li>
+                    <hr color="black">
+                    <li><h3><i class="Crop_Pre"></i><a href="https://gstempire.com/krishi/login" style="color:rgb(6, 2, 2);">E-Commerce</a></h3></li>
+                    <hr color="black">
+                    <li><h3><i class="Crop_Pre"></i><a href="e_market" style="color:rgb(6, 2, 2);">E-Market</a></h3></li>
+                    <hr color="black">
+                    <h3><a href="log_out" style="color:rgb(16, 4, 4);"> Log Out </a></h3>
+                    <hr color="black">
+    
+                </div>
+            </div>
+        </div>
+    
+        <div class="col-lg-8">
+            <div class="row">
+                <div class="card" style="width: 18rem;">
+                    <img class="card-img-top" src="/static/images/Kisan-Credit-Card.jpg" alt="Card image cap">
+                    <h2>Pradhan Mantri Kisan Credit Card (PMKCC)</h2>
+
+                    <p>This scheme provides farmers with access to short-term credit for their
+                        agricultural
+                        needs. It simplifies the credit delivery system and offers interest rate concessions to farmers
+                        who
+                        repay
+                        loans on time.</p>
+                    <a href="https://eseva.csccloud.in/KCC/Default.aspx" class="btn btn-primary">Go To Site</a>
+                </div>
+                <div class="card" style="width: 18rem;">
+                    <img class="card-img-top" src="/static/images/farm.jpg" alt="Card image cap">
+                    <h2>Interest Subvention Scheme for Crop Loans</h2>
+                    <p>Under this scheme, farmers are provided with short-term crop loans at a
+                        subsidized
+                        interest rate. If they repay the loan promptly, they can avail an additional interest rate
+                        reduction.
+                    </p><br><br><br>
+                    <a href="https://www.google.com/url?sa=t&source=web&rct=j&opi=89978449&url=https://www.nabard.org/content1.aspx%3Fid%3D602%26catid%3D23%26mid%3D23%23:~:text%3DTo%2520provide%2520relief%2520to%2520farmers,laid%2520down%2520by%2520the%2520RBI.&ved=2ahUKEwiCg97DvtmBAxUTyzgGHScHBsYQFnoECAgQBQ&usg=AOvVaw0Q2vN2g5e_0r8H5UR3uL3L"
+                        class="btn btn-primary">Go To Site</a>
+                </div>
+                <div class="card" style="width: 18rem;">
+                    <img class="card-img-top" src="/static/images/Wine-Estate-Facebook-Cover-1170x659 (1).png"
+                        alt="Card image cap">
+                    <h2>National Horticulture Mission (NHM)</h2>
+                    <p>This is a crop insurance scheme that helps farmers mitigate financial losses
+                        due to
+                        natural calamities, pests, or diseases. The premium is heavily subsidized, making it affordable
+                        for
+                        farmers.
+                    </p><br>
+                    <a href="https://www.google.com/url?sa=t&source=web&rct=j&opi=89978449&url=https://en.m.wikipedia.org/wiki/National_Horticulture_Mission%23:~:text%3DThe%2520National%2520Horticulture%2520Mission%2520"
+                        class="btn btn-primary">Go To Site</a>
+                </div>
+                <div class="card" style="width: 18rem;">
+                    <img class="card-img-top" src="/static/images/NMSA.jpg" alt="Card image cap">
+                    <h2>National Mission for Sustainable Agriculture</h2>
+                    <p>While not specific to farmers, the Pradhan Mantri Mudra Yojana offers loans to
+                        micro and small entrepreneurs, including those engaged in agriculture and allied activities.</p>
+                    <a href="https://www.google.com/url?sa=t&source=web&rct=j&opi=89978449&url=https://vikaspedia.in/agriculture/policies-and-schemes/crops-related/krishi-unnati-yojana/national-mission-for-sustainable-agriculture-1/national-mission-for-sustainable-agriculture%23:~:text%3DNational%2520Mission%2520for%2520Sustainable%2520Agriculture%2520(NMSA)%2520has%2520been%2520formulated%2520for,management%2520and%2520synergizing%2520resource%2520conservation.&ved=2ahUKEwjx_6-uv9mBAxXgyzgGHfrDC2sQFnoECAsQBQ&usg=AOvVaw3z_Bjy_qaPSIE-2_u8h0Q7"
+                        class="btn btn-primary">Go To Site</a>
+                </div>
+                <div class="card" style="width: 18rem;">
+                    <img class="card-img-top" src="/static/images/AIFS.jpg" alt="Card image cap">
+                    <h2>Agriculture Infrastructure Fund</h2>
+                    <p> This scheme aims to provide financial support for the development of post-harvest infrastructure
+                        and community farming assets. It can benefit farmers and agri-entrepreneurs.</p>
+                    <a href="https://www.agriinfra.dac.gov.in/" class="btn btn-primary">Go To Site</a>
+                </div>
+
+                <div class="card" style="width: 18rem;">
+                    <img class="card-img-top" src="/static/images/mudra-yojna.webp" alt="Card image cap">
+                    <h2>MUDRA Yojana</h2>
+                    <p>While not specific to farmers, the Pradhan Mantri Mudra Yojana offers loans to micro and small
+                        entrepreneurs, including those engaged in agriculture and allied activities.</p>
+                    <a href="https://www.myscheme.gov.in/schemes/pmmy" class="btn btn-primary">Go To Site</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endblock body %}

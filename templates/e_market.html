@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard{% endblock title %}
+{% block body %}
+
+{% if user.is_authenticated %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-lg-3 bg-light d-none d-md-block sidebar">
+            <div class="mb-1" style="background-color: rgb(245,222,179); height:100%;">
+                <div class="text-center"><br><br>
+                    <img src="/static/images/farmer_icon.png" alt="avatar" class="rounded-circle img-fluid"
+                        style="width: 100px; margin-top: 30px;">
+                    <h1 class="mt-0 mb-3" style="color:rgb(0, 0, 0);"> {{first_name}} {{last_name}} </h1>
+                    <hr color="black">
+                    
+                    <li><h3><a href="dashboard" style="color: rgb(0, 0, 0);">Home</a></h3></li>
+                    <hr color="black">
+                    <li><h3><a href="crop_prediction" style="color:rgb(6, 2, 2);">Crop Prediction</a></h3></li>
+                    <hr color="black">
+                    <li><h3><a href="fert_rec" style="color:rgb(5, 1, 1);">Fertilizer Recommendation</a></h3></li>
+                    <hr color="black">
+                    <li><h3><a href="crop_dis" style="color:rgb(5, 1, 1);">Crop Disease</a></h3></li>
+                    <hr color="black">
+                    <div class="dropdown">
+                  <button class="btn btn-secondary dropdown-toggle" style="background-color: hsl(182, 48%, 28%)"
+                      type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true"
+                      aria-expanded="false">
+                      Basic Information
+                  </button>
+                  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                      <a class="dropdown-item"
+                          href="https://krishi.maharashtra.gov.in/Site/Information/DisplayGuideLines.aspx?MenuID=1143">Government
+                          Yojna</a>
+                      <a class="dropdown-item" href="loan1">Loans</a>
+                      <a class="dropdown-item" href="insurance">Insurance</a>
+                  </div>
+              </div>
+              <hr color="black">
+                    <li><h3><a href="news" style="color:rgb(6, 2, 2);">News</a></h3></li>
+                    <hr color="black">
+                    <li><h3><a href="https://agmarknet.gov.in/" style="color:rgb(6, 2, 2);">E-Commerce</a></h3></li>
+                    <hr color="black">
+                    <li><h3><a href="#" style="color:rgb(6, 2, 2);">E-Market</a></h3></li>
+                    <hr color="black">
+                    <h3><a href="log_out" style="color:rgb(16, 4, 4);"> Log Out </a></h3>
+                    <hr color="black">
+                </div>
+            </div>
+        </div>
+
+        <!-- Main content -->
+        <div class="col-lg-9 d-flex align-items-center justify-content-center" style="height: 740px;">
+            <form action="{% url 'upload_crop_image' %}" method="POST" enctype="multipart/form-data" class="bg-white shadow p-5 rounded" style="width: 100%; max-width: 500px;">
+                {% csrf_token %}
+                <h2 class="text-center mb-4">Upload Crop Image</h2>
+
+                <div class="form-group mb-4">
+                    <label for="crop_image"><strong>Choose Image:</strong></label>
+                    <input type="file" class="form-control" id="crop_image" name="crop_image" required>
+                </div>
+
+                <div class="form-group mb-4">
+                    <label for="quantity"><strong>Enter Quantity (in Kg):</strong></label>
+                    <input type="number" class="form-control" id="quantity" name="quantity" min="1" required>
+                </div>
+
+                <button type="submit" class="btn btn-success btn-block">Upload</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% endblock body %}

@@ -1,0 +1,202 @@
+{% extends 'base.html' %}
+{% block title %}Crop Prediction{% endblock title %}
+{% block body %}
+
+<div class="row col-lg-12">
+    <div class="col-lg-3 bg-light d-none d-md-block sidebar">
+        <div class="mb-1" style="background-color: rgb(245,222,179); height:610px;">
+            <div class="text-center">
+                <img src="/static/images/farmer_icon.png" alt="avatar" class="rounded-circle img-fluid"
+                        style="width: 100px; margin-top: 30px;">
+                <h1 class="mt-0 mb-3" style="color:rgb(0, 0, 0);"> {{ first_name }} {{ last_name }} </h1>
+                <hr color="black">
+                <li>
+                    <h3><i class="basicinfo"></i><a href="dashboard" style="color: rgb(0, 0, 0);">Home</a></h3>
+                </li>
+                <hr color="black">
+                <li>
+                    <h3><i class="Crop_Pre"></i><a href="crop_prediction" style="color:rgb(6, 2, 2);">Crop Prediction</a></h3>
+                </li>
+                <hr color="black">
+                <li>
+                    <h3><i class="Crop_Dis"></i><a href="fert_rec" style="color:rgb(5, 1, 1);">Fertilizer Recommendation</a></h3>
+                </li>
+                <hr color="black">
+                <li>
+                    <h3><i class="Crop_Dis"></i><a href="crop_dis" style="color:rgb(5, 1, 1);">Crop Disease</a></h3>
+                </li>
+                <hr color="black">
+                                <div class="dropdown">
+                    <button class="btn btn-secondary dropdown-toggle" style="background-color: hsl(182, 48%, 28%)"
+                        type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true"
+                        aria-expanded="false">
+                        Basic Information
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        <a class="dropdown-item"
+                            href="https://krishi.maharashtra.gov.in/Site/Information/DisplayGuideLines.aspx?MenuID=1143">Government
+                            Yojna</a>
+                        <a class="dropdown-item" href="loan1">Loans</a>
+                        <a class="dropdown-item" href="insurance">Insurance</a>
+                    </div>
+                </div>
+                <hr color="black">
+                <li><h3><i class="Crop_Pre"></i><a href="news" style="color:rgb(6, 2, 2);">News</a></h3></li>
+                <hr color="black"> 
+                <li><h3><i class="Crop_Pre"></i><a href="https://agmarknet.gov.in/" style="color:rgb(6, 2, 2);">E-Commerce</a></h3></li>
+                <hr color="black">
+                <li><h3><i class="Crop_Pre"></i><a href="e_market" style="color:rgb(6, 2, 2);">E-Market</a></h3></li>
+                <hr color="black">
+                <h3><a href="log_out" style="color:rgb(16, 4, 4);"> Log Out </a></h3>
+                <hr color="black">
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-8">
+        <div class="mb-1" style="height:600px;">
+            <h1 class="ballet_text mt-1" style="color:#007406;"><b>Latest Agricultural News</b></h1>
+            
+            <!-- Search input for filtering news -->
+            <div class="input-group mb-4">
+                <input type="text" class="form-control" id="search-input" placeholder="Search for agricultural news or government schemes...">
+                <button class="btn btn-primary" onclick="fetchNews()">Search</button>
+            </div>
+    
+            <div id="news-container" class="row">
+                <!-- News cards will appear here -->
+            </div>
+             <!-- Pagination Controls -->
+             <div id="pagination-controls" class="mt-4 text-center">
+                <!-- Pagination buttons will appear here -->
+            </div>
+        </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let currentPage = 1; // Current page index
+const itemsPerPage = 4; // Maximum number of items per page
+
+async function fetchNews() {
+    const searchQuery = document.getElementById("search-input").value;
+    if (!searchQuery) {
+        alert("Please enter a search term!");
+        return;
+    }
+
+    try {
+        const response = await fetch(`/search_news/?query=${encodeURIComponent(searchQuery)}`);
+        const newsData = await response.json();
+
+        if (newsData && newsData.length > 0) {
+            renderPagination(newsData);
+            renderNews(newsData, currentPage);
+        } else {
+            const newsContainer = document.getElementById("news-container");
+            newsContainer.innerHTML = "<p>No news found for your query.</p>";
+        }
+    } catch (error) {
+        console.error("Error fetching news:", error);
+        alert("Failed to fetch news. Please try again.");
+    }
+}
+
+function renderNews(newsData, page) {
+    const newsContainer = document.getElementById("news-container");
+    newsContainer.innerHTML = ""; // Clear previous results
+
+    const start = (page - 1) * itemsPerPage;
+    const end = start + itemsPerPage;
+    const pageData = newsData.slice(start, end);
+
+    pageData.forEach(news => {
+        const card = document.createElement("div");
+        card.className = "card col-lg-4 p-3";
+        card.innerHTML = `
+            <h4 class="card-title">${news.title}</h4>
+            <p>${news.description || "No description available."}</p>
+            <a href="${news.url}" target="_blank" class="btn btn-primary">Read More</a>
+        `;
+        newsContainer.appendChild(card);
+    });
+}
+
+function renderPagination(newsData) {
+    const paginationControls = document.getElementById("pagination-controls");
+    paginationControls.innerHTML = ""; // Clear previous controls
+
+    const totalPages = Math.ceil(newsData.length / itemsPerPage);
+
+    for (let i = 1; i <= totalPages; i++) {
+        const button = document.createElement("button");
+        button.className = "btn btn-outline-primary mx-1";
+        button.textContent = i;
+        button.onclick = () => {
+            currentPage = i;
+            renderNews(newsData, currentPage);
+            updateActiveButton(i);
+        };
+
+        if (i === currentPage) {
+            button.classList.add("active");
+        }
+
+        paginationControls.appendChild(button);
+    }
+}
+
+function updateActiveButton(activePage) {
+    const buttons = document.querySelectorAll("#pagination-controls .btn");
+    buttons.forEach(button => button.classList.remove("active"));
+    buttons[activePage - 1].classList.add("active");
+}
+</script>
+
+<style>
+    .card {
+        height: 300px; /* Set a fixed height for all cards */
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between; /* Ensures equal spacing */
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+        padding: 15px;
+        overflow: hidden; /* Prevents content overflow */
+    }
+    
+    .card .card-title {
+        font-size: 1.2rem;
+        font-weight: bold;
+        white-space: nowrap; /* Prevents title wrapping */
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    .card p {
+        flex-grow: 1; /* Ensures the text section expands equally */
+        font-size: 0.95rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 3; /* Limits text to 3 lines */
+        -webkit-box-orient: vertical;
+    }
+    
+    .card .btn {
+        width: 100%; /* Makes buttons uniform */
+        margin-top: auto; /* Pushes button to the bottom */
+        align-self: center;
+    }
+    
+    
+    #pagination-controls {
+        text-align: center;
+    }
+    
+    #pagination-controls .btn {
+        margin: 5px;
+    }
+</style> 
+{% endblock body %}
