@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% block title %}Fertilizer Recommendation{% endblock title %}
+{% block body %}
+<div class="row col-lg-12">
+    <div class="col-lg-3  bg-light d-none d-md-block sidebar">
+        <div class="mb-1" style="background-color: rgb(245,222,179); height:610px;">
+            <div class="text-center">
+                <img src="/static/images/farmer_icon.png" alt="avatar" class="rounded-circle img-fluid"
+                    style="width: 100px; margin-top: 30px;">
+                <h1 class="mt-0 mb-3" style="color:rgb(0, 0, 0);"> {{first_name}} {{last_name}} </h1>
+                <hr color="black">
+
+                <li><h3><i class="basicinfo"></i><a href="dashboard" style="color: rgb(0, 0, 0);">Home</a></h3></li>
+                <hr color="black">
+                    <li><h3><i class="Crop_Pre"></i><a href="crop_prediction" style="color:rgb(6, 2, 2);">Crop Prediction</a></h3></li>
+                    <hr color="black">
+                    <li><h3><i class="Fert_Rec"></i><a href="fert_rec" style="color:rgb(5, 1, 1);">Fertilizer Recommendation</a></h3></li>
+                    <hr color="black">
+                    <li><h3><i class="Crop_Dis"></i><a href="crop_dis" style="color:rgb(5, 1, 1);">Crop Disease</a></h3></li>
+                    <hr color="black">
+                    <div class="dropdown">
+                    <button class="btn btn-secondary dropdown-toggle" style="background-color: hsl(182, 48%, 28%)"
+                        type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true"
+                        aria-expanded="false">
+                        Basic Information
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        <a class="dropdown-item"
+                            href="https://krishi.maharashtra.gov.in/Site/Information/DisplayGuideLines.aspx?MenuID=1143">Government
+                            Yojna</a>
+                        <a class="dropdown-item" href="loan1">Loans</a>
+                        <a class="dropdown-item" href="insurance">Insurance</a>
+                    </div>
+                </div>
+                <hr color="black">
+                    <li><h3><i class="Crop_Pre"></i><a href="news" style="color:rgb(6, 2, 2);">News</a></h3></li>
+                    <hr color="black">
+                    <li><h3><i class="Crop_Pre"></i><a href="https://agmarknet.gov.in/" style="color:rgb(6, 2, 2);">E-Commerce</a></h3></li>
+                    <hr color="black">
+                    <li><h3><i class="Crop_Pre"></i><a href="e_market" style="color:rgb(6, 2, 2);">E-Market</a></h3></li>
+                    <hr color="black">
+                    <h3><a href="log_out" style="color:rgb(16, 4, 4);"> Log Out </a></h3>
+                    <hr color="black">
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-8">
+        <div class="mb-1" style="height:600px;">
+            <h1 class="ballet_text mt-1" style="color:#007406;"><b>Fertilizer Recommendation</b></h1>
+            <form action="" method="POST">
+                {% csrf_token %}
+                <div class="text-center">
+                    <div class="row">
+                        <div class="col-md-6 m-auto">
+                            <div class="mail_section">
+                                <input type="text" class="mail_text" value="{{farmer_name}}"
+                                    placeholder="Farmer Name" name="farmer_name">
+                                <input type="number" class="mail_text" value="{{n}}"
+                                    placeholder="Ratio of Nitrogen Content (0-100)" name="n">
+                                <input type="number" class="mail_text" value="{{p}}"
+                                    placeholder="Ratio of Phosphorous Content (0-100)" name="p">
+                                <input type="number" class="mail_text" value="{{k}}"
+                                    placeholder="Ratio of Potassium Content (0-100)" name="k">
+                                <input type="text" class="mail_text" value="{{temperature}}"
+                                    placeholder="Temperature (in degree Celsius)" name="temperature">
+                                <input type="text" class="mail_text" value="{{humidity}}"
+                                    placeholder="Humidity (in %)" name="humidity">
+                                
+                                <button type="submit" style="margin-top: 20px;" class="btn btn-success">Predict Fertilizer</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+    {% endblock body %}
