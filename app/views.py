@@ -146,22 +146,48 @@ def crop_prediction(request):
         
         verify = input_verification(farmer_name, contact_no, n, p, k, temperature, humidity, ph, rainfall)
         if verify == "Success":
+            
             with open('dataset/crop_prediction.pkl', 'rb') as f:
-                NaiveBayes = pickle.load(f)
-            data = np.array([[n,p,k,temperature,humidity,ph,rainfall]], dtype=float)
-            pred = NaiveBayes.predict(data)
-
-            message = 'Predicted Crop is : ' + pred[0]
-            crop = Crop_Details(farmer_name = farmer_name, contact_no = contact_no, n = n, p = p, k = k, temperature = temperature, humidity= humidity, ph = ph, rainfall = rainfall)
+                model = pickle.load(f)
+            
+            
+            with open('dataset/label_encoder.pkl', 'rb') as f:
+                le = pickle.load(f)
+            
+           
+            data = np.array([[n, p, k, temperature, humidity, ph, rainfall]], dtype=float)
+            
+            # Predict
+            pred_id = model.predict(data)[0]  # numeric label
+            crop_name = le.inverse_transform([pred_id])[0]  # convert to string
+            
+            # Message
+            message = 'Predicted Crop is : ' + str(crop_name)
+            
+            # Save to DB
+            crop = Crop_Details(
+                farmer_name = farmer_name,
+                contact_no = contact_no,
+                n = n,
+                p = p,
+                k = k,
+                temperature = temperature,
+                humidity= humidity,
+                ph = ph,
+                rainfall = rainfall
+            )
             crop.prediction = message
             crop.date = datetime.today()
             crop.save()
+            
             messages.info(request, message)
             return redirect("crop_report")
         else:
             messages.error(request, verify)
             return redirect("dashboard")
+    
     return render(request, "crop_prediction.html", {'navbar': 'home'})
+
 
 
 def crop_dis(request):
