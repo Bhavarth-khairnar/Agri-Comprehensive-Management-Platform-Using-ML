@@ -54,60 +54,105 @@ def authentication(first_name, last_name, pass1, pass2, phone_number):
 
 #                                            Authenticate Input                                            #
 ############################################################################################################
+# Validators
 def farmer_name_valid(full_name):
-    res = full_name != '' and all(chr.isalpha() or chr.isspace() for chr in full_name)
-    if res:
-        return True
-    else:
-        return False
+    return bool(full_name) and all(ch.isalpha() or ch.isspace() for ch in full_name)
+
+
+def contact_valid(contact_no):
+    return contact_no.isdigit() and len(contact_no) == 10
+
 
 def ratio_valid(ratio):
-    if int(ratio) >= 0 and int(ratio) <= 100:
-        return True
-    else:
+    try:
+        return 0 <= int(ratio) <= 100
+    except:
         return False
+
 
 def percentage_valid(percent):
-    if float(percent) >= 0 and float(percent) <= 100:
-        return True
-    else:
+    try:
+        return 0 <= float(percent) <= 100
+    except:
         return False
+
 
 def ph_valid(pH):
-    if float(pH) >= 0 and float(pH) <= 14:
-        return True
-    else:
+    try:
+        return 0 <= float(pH) <= 14
+    except:
         return False
+
 
 def rainfall_valid(mm):
-    if float(mm) >= 0:
-        return True
-    else:
+    try:
+        return float(mm) >= 0
+    except:
         return False
+    
 
-def input_verification(farmer_name, contact_no, n, p, k, temperature, humidity, ph, rainfall):
-    if farmer_name_valid(farmer_name) == False:
+def soil_type_valid(soil_type):
+    allowed_soils = ["loamy", "sandy", "clayey", "black", "red"]
+    return soil_type.lower() in allowed_soils
+
+
+def season_valid(season):
+    allowed_season = ["kharif", "rabi", "zaid", "perennial"]
+    return season.lower() in allowed_season
+
+
+def region_valid(region):
+    allowed_region = ["nashik", "konkan", "vidarbha", "west bengal"]
+    return region.lower() in allowed_region
+        
+
+def input_verification(
+    farmer_name, contact_no,
+    n, p, k,
+    temperature, humidity, ph, rainfall,
+    soil_type, season, region
+):
+    if not farmer_name_valid(farmer_name):
         return "Invalid Farmer Name"
-    elif contact_valid(contact_no) == False:
+
+    elif not contact_valid(contact_no):
         return "Invalid Contact Number"
-    elif ratio_valid(n) == False:
+
+    elif not ratio_valid(n):
         return "Invalid ratio of Nitrogen content in soil"
-    elif ratio_valid(p) == False:
+
+    elif not ratio_valid(p):
         return "Invalid ratio of Phosphorous content in soil"
-    elif ratio_valid(k) == False:
+
+    elif not ratio_valid(k):
         return "Invalid ratio of Potassium content in soil"
-    elif percentage_valid(temperature) == False:
+
+    elif not percentage_valid(temperature):
         return "Invalid Temperature Value"
-    elif percentage_valid(humidity) == False:
-        return "Invalid Humidity Pecentage"
-    elif ph_valid(ph) == False:
+
+    elif not percentage_valid(humidity):
+        return "Invalid Humidity Percentage"
+
+    elif not ph_valid(ph):
         return "Invalid pH Value"
-    elif rainfall_valid(rainfall) == False:
+
+    elif not rainfall_valid(rainfall):
         return "Invalid Rainfall (in mm)"
+
+    elif not soil_type_valid(soil_type):
+        return "Invalid Soil Type"
+
+    elif not season_valid(season):
+        return "Invalid Season"
+
+    elif not region_valid(region):
+        return "Invalid Region"
+
     else:
         return "Success"
 
-def input_verification1(farmer_name, n, p, k, temperature, humidity):
+
+def input_verification1(farmer_name, n, p, k, temperature, humidity,):
     if farmer_name_valid(farmer_name) == False:
         return "Invalid Farmer Name"
     elif ratio_valid(n) == False:

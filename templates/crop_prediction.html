@@ -82,6 +82,12 @@
                                     placeholder="pH Value of Soil (0-14)" name="ph">
                                 <input type="text" class="mail_text" value="{{rainfall}}" placeholder="Rainfall (in mm)"
                                     name="rainfall">
+                                <input type="text" class="mail_text" value="{{ soil_type }}" placeholder="Soil Type"
+                                    name="soil_type">   
+                                <input type="text" class="mail_text" value="{{season}}" placeholder="Season"
+                                    name="season"> 
+                                 <input type="text" class="mail_text" value="{{region}}" placeholder="Region"
+                                    name="region">     
                                 <button type="submit" style="margin-top: 20px;" class="btn btn-success">Predict
                                     Crop</button>
                             </div>
@@ -92,4 +98,4 @@
         </div>
     </div>
 </div>
-    {% endblock body %}
+{% endblock body %}

@@ -92,7 +92,7 @@
                       <tr>
                         <th scope="row">Humidity (in %) :</th>
                         <td colspan="2">{{ crop_data.humidity }}</td>
-                      </tr>
+                      </tr> 
                       <tr>
                         <th scope="row">pH Value of Soil (0-14) :</th>
                         <td colspan="2">{{ crop_data.ph }}</td>
@@ -102,10 +102,23 @@
                         <td colspan="2">{{ crop_data.rainfall }}</td>
                       </tr>
                       <tr>
-                        <th scope="row">
-                          <h3><b>{{ crop_data.prediction }}</b></h3>
-                        </th>
-                        <td colspan="2"></td>
+                        <th scope="row">Soil Type :</th>
+                        <td colspan="2">{{crop_data.soil_type}}</td>
+                      </tr>
+                      <tr>
+                        <th scope="row">Season :</th>
+                        <td colspan="2">{{crop_data.season}}</td>
+                      </tr>
+                      <tr>
+                        <th scope="row">Region :</th>
+                        <td colspan="2">{{crop_data.region}}</td>
+                      </tr>
+                      <tr>
+                        <td colspan="3" class="text-center">
+                          <h2 style="color:#0a7d00">
+                            {{ crop_data.prediction }}
+                          </h2>
+                        </td>
                       </tr>
                     </tbody>
                   </table>

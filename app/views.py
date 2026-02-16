@@ -11,6 +11,7 @@ from keras.models import load_model
 from keras.preprocessing.image import img_to_array, load_img
 from keras.applications.vgg19 import preprocess_input
 import numpy as np
+# New One 
 import tensorflow as tf
 import pickle
 from datetime import datetime
@@ -143,48 +144,77 @@ def crop_prediction(request):
         humidity = request.POST['humidity']
         ph = request.POST['ph']
         rainfall = request.POST['rainfall']
+        soil_type = request.POST['soil_type']
+        season = request.POST['season']
+        region = request.POST['region']
         
-        verify = input_verification(farmer_name, contact_no, n, p, k, temperature, humidity, ph, rainfall)
-        if verify == "Success":
-            
-            with open('dataset/crop_prediction.pkl', 'rb') as f:
-                model = pickle.load(f)
-            
-            
-            with open('dataset/label_encoder.pkl', 'rb') as f:
-                le = pickle.load(f)
-            
-           
-            data = np.array([[n, p, k, temperature, humidity, ph, rainfall]], dtype=float)
-            
-            # Predict
-            pred_id = model.predict(data)[0]  # numeric label
-            crop_name = le.inverse_transform([pred_id])[0]  # convert to string
-            
-            # Message
-            message = 'Predicted Crop is : ' + str(crop_name)
-            
-            # Save to DB
-            crop = Crop_Details(
-                farmer_name = farmer_name,
-                contact_no = contact_no,
-                n = n,
-                p = p,
-                k = k,
-                temperature = temperature,
-                humidity= humidity,
-                ph = ph,
-                rainfall = rainfall
-            )
-            crop.prediction = message
-            crop.date = datetime.today()
-            crop.save()
-            
-            messages.info(request, message)
-            return redirect("crop_report")
-        else:
+        # Input verification
+        verify = input_verification(farmer_name, contact_no, n, p, k, temperature, humidity, ph, rainfall, soil_type, season, region)
+        if verify != "Success":
             messages.error(request, verify)
             return redirect("dashboard")
+        
+        # Load model and label encoder
+        with open('dataset/crop_prediction.pkl', 'rb') as f:
+            model = pickle.load(f)
+        with open('dataset/label_encoder.pkl', 'rb') as f:
+            le = pickle.load(f)
+        
+        # Create DataFrame with all 10 features for prediction
+        import pandas as pd
+        
+        data = pd.DataFrame({
+            'n': [int(n)],
+            'p': [int(p)],
+            'k': [int(k)],
+            'ph': [float(ph)],
+            'temperature': [float(temperature)],
+            'humidity': [float(humidity)],
+            'rainfall': [float(rainfall)],
+            'soil_type': [soil_type],
+            'season': [season],
+            'region': [region]
+        })
+        
+        # Convert categorical columns to category dtype (required for XGBoost) 
+        categorical_cols = ['soil_type', 'season', 'region']
+        for col in categorical_cols:
+            data[col] = data[col].astype('category')
+        
+        # Prediction function
+        def predict_top_k(model, label_encoder, data, top_k=3):
+            probs = model.predict_proba(data)
+            top_k_indices = np.argsort(probs, axis=1)[:, -top_k:][:, ::-1]
+            top_k_crop_names = [label_encoder.inverse_transform(row) for row in top_k_indices]
+            top_k_confidence = np.take_along_axis(probs, top_k_indices, axis=1)
+            return top_k_crop_names[0], [round(c*100, 2) for c in top_k_confidence[0]]
+
+        top_crops, conf = predict_top_k(model, le, data, top_k=3)
+        
+        # Create message string
+        message = "Top-3 Recommended Crops: " + ", ".join(top_crops)
+        
+        # FIXED: Save to DB with all fields including categorical ones
+        crop = Crop_Details(
+            farmer_name=farmer_name,
+            contact_no=contact_no,
+            n=n,
+            p=p,
+            k=k,
+            temperature=temperature,
+            humidity=humidity,
+            ph=ph,
+            rainfall=rainfall,
+            soil_type=soil_type,      
+            season=season,            
+            region=region,            
+            prediction=message,
+            date=datetime.today()
+        )
+        crop.save()
+        
+        messages.info(request, message)
+        return redirect("crop_report")
     
     return render(request, "crop_prediction.html", {'navbar': 'home'})
 
