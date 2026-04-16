@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.urls import path
 from app import views
+from .views import crop_prediction_api
 
 urlpatterns = [
     path("", views.index, name= "home"),
@@ -21,6 +22,7 @@ urlpatterns = [
     path("loan1", views.loan1, name= "loan1"),
     path("insurance", views.insurance, name= "insurance"),
     path("crop_prediction", views.crop_prediction, name= "crop_prediction"),
+    path('crop_api/', views.crop_prediction_api, name="crop_prediction_api"),
     path("crop_dis", views.crop_dis, name= "crop_dis"),
     path("fert_rec", views.fert_rec, name= "fert_rec"),
     path("fert_report", views.fert_report, name= "fert_report"),

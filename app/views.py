@@ -15,6 +15,15 @@ import numpy as np
 import tensorflow as tf
 import pickle
 from datetime import datetime
+import pandas as pd
+#DRF 
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from .models import *
+import re 
+from django.views.decorators.csrf import csrf_exempt
+
+
 # Create your views here.
 def index(request):
     return render(request, "index.html", {'navbar' : 'home'})
@@ -79,7 +88,7 @@ def dashboard(request):
     
     return render(request, "dashboard.html", context)
 
-
+# Crop_report UI view
 @login_required(login_url="log_in")
 @cache_control(no_cache = True, must_revalidate = True, no_store = True)
 def crop_report(request):
@@ -133,90 +142,128 @@ def loan1(request):
 def insurance(request):
     return render(request, "insurance.html", {'navbar' : 'home'})
 
-def crop_prediction(request):
-    if request.method == "POST":
-        farmer_name = request.POST['farmer_name']
-        contact_no = request.POST['contact_no']
-        n = request.POST['n']
-        p = request.POST['p']
-        k = request.POST['k']
-        temperature = request.POST['temperature']
-        humidity = request.POST['humidity']
-        ph = request.POST['ph']
-        rainfall = request.POST['rainfall']
-        soil_type = request.POST['soil_type']
-        season = request.POST['season']
-        region = request.POST['region']
-        
-        # Input verification
-        verify = input_verification(farmer_name, contact_no, n, p, k, temperature, humidity, ph, rainfall, soil_type, season, region)
-        if verify != "Success":
-            messages.error(request, verify)
-            return redirect("dashboard")
-        
-        # Load model and label encoder
-        with open('dataset/crop_prediction.pkl', 'rb') as f:
-            model = pickle.load(f)
-        with open('dataset/label_encoder.pkl', 'rb') as f:
-            le = pickle.load(f)
-        
-        # Create DataFrame with all 10 features for prediction
-        import pandas as pd
-        
-        data = pd.DataFrame({
-            'n': [int(n)],
-            'p': [int(p)],
-            'k': [int(k)],
-            'ph': [float(ph)],
-            'temperature': [float(temperature)],
-            'humidity': [float(humidity)],
-            'rainfall': [float(rainfall)],
-            'soil_type': [soil_type],
-            'season': [season],
-            'region': [region]
-        })
-        
-        # Convert categorical columns to category dtype (required for XGBoost) 
-        categorical_cols = ['soil_type', 'season', 'region']
-        for col in categorical_cols:
-            data[col] = data[col].astype('category')
-        
-        # Prediction function
-        def predict_top_k(model, label_encoder, data, top_k=3):
-            probs = model.predict_proba(data)
-            top_k_indices = np.argsort(probs, axis=1)[:, -top_k:][:, ::-1]
-            top_k_crop_names = [label_encoder.inverse_transform(row) for row in top_k_indices]
-            top_k_confidence = np.take_along_axis(probs, top_k_indices, axis=1)
-            return top_k_crop_names[0], [round(c*100, 2) for c in top_k_confidence[0]]
 
-        top_crops, conf = predict_top_k(model, le, data, top_k=3)
+# COMMON Load Model for croap prediction 
+def load_model_and_encoder():
+    with open('dataset/crop_prediction.pkl', 'rb') as f:
+        model = pickle.load(f)
+
+    with open('dataset/label_encoder.pkl', 'rb') as f:
+        le = pickle.load(f)
+
+    return model, le
+
+
+
+# COMMON Prepare Input
+def prepare_input_data(n, p, k, ph, temperature, humidity, rainfall, soil_type, season, region):
+    df = pd.DataFrame({
+        'n': [int(n)],
+        'p': [int(p)],
+        'k': [int(k)],
+        'ph': [float(ph)],
+        'temperature': [float(temperature)],
+        'humidity': [float(humidity)],
+        'rainfall': [float(rainfall)],
+        'soil_type': [soil_type],
+        'season': [season],
+        'region': [region]
+    })
+
+    for col in ['soil_type', 'season', 'region']:
+        df[col] = df[col].astype('category')
+
+    return df
+
+# Commen Prediction Logic
+def predict_top_crops(model, label_encoder, data, top_k=3):
+    probs = model.predict_proba(data)
+
+    top_k_indices = np.argsort(probs, axis=1)[:, -top_k:][:, ::-1]
+    crops = label_encoder.inverse_transform(top_k_indices[0])
+
+    confidence = np.take_along_axis(probs, top_k_indices, axis=1)[0]
+
+    return (
+        crops,
+        [round(float(c) * 100, 2) for c in confidence]
+    )
+
+# UI VIEW for crop prediction 
+def crop_prediction(request):
+    return render(request, "crop_prediction.html", {
+        'first_name': request.user.first_name,
+        'last_name': request.user.last_name
+    })
+
+
+# Mobile Number Validation Function
+def validation_phone(number):
+    pattern = r'^[0-9]\d{9}$'
+    if re.match(pattern, number):
+        return True
+    return False
+
+
+# API VIEW for crop prediction
+@api_view(['POST'])
+@csrf_exempt
+def crop_prediction_api(request):
+    try:
+        data = request.data 
         
-        # Create message string
+        contact_no = data.get('contact_no','')
+        
+        if not validation_phone(contact_no):
+            return Response({"error": "Invalid phone number. Must be 10 digits"}, status=400)
+
+        # Convert types
+        n = int(data['n'])
+        p = int(data['p'])
+        k = int(data['k'])
+        ph = float(data['ph'])
+        temperature = float(data['temperature'])
+        humidity = float(data['humidity'])
+        rainfall = float(data['rainfall'])
+
+        soil_type = data['soil_type']
+        season = data['season']
+        region = data['region']
+
+        model, le = load_model_and_encoder()
+
+        df = prepare_input_data(
+            n, p, k, ph, temperature, humidity,
+            rainfall, soil_type, season, region
+        )
+
+        top_crops, conf = predict_top_crops(model, le, df)
+
         message = "Top-3 Recommended Crops: " + ", ".join(top_crops)
         
-        # FIXED: Save to DB with all fields including categorical ones
-        crop = Crop_Details(
-            farmer_name=farmer_name,
-            contact_no=contact_no,
-            n=n,
-            p=p,
-            k=k,
+        Crop_Details.objects.create(
+            user=request.user,
+            farmer_name=data.get('farmer_name', ''),
+            contact_no = contact_no,
+            n=n, p=p, k=k,
+            ph=ph,
             temperature=temperature,
             humidity=humidity,
-            ph=ph,
             rainfall=rainfall,
-            soil_type=soil_type,      
-            season=season,            
-            region=region,            
+            soil_type=soil_type,
+            season=season,
+            region=region,
             prediction=message,
             date=datetime.today()
         )
-        crop.save()
-        
-        messages.info(request, message)
-        return redirect("crop_report")
-    
-    return render(request, "crop_prediction.html", {'navbar': 'home'})
+
+        return Response({
+            "status": "success"
+        })
+
+    except Exception as e:
+        print("ERROR:", e)
+        return Response({"error": str(e)}, status=500)  
 
 
 

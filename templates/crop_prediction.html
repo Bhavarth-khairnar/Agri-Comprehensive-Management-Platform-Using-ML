@@ -58,7 +58,7 @@
         <div class="mb-1" style="height:600px;">
             <h1 class="ballet_text mt-1" style="color:#007406;"><b>
                 Crop Recommendation Form</b></h1>
-            <form action="" method="POST">
+            <form id="CropForm">
                 {% csrf_token %}
                 <div class="text-center">
                     <div class="row">
@@ -67,7 +67,7 @@
                                 <input type="text" class="mail_text" value="{{farmer_name}}" placeholder="Farmer Name"
                                     name="farmer_name">
                                 <input type="number" class="mail_text" value="{{contact_no}}"
-                                    placeholder="Contact Number" name="contact_no">
+                                    placeholder="Contact Number" pattern="[0-9]{1}[0-9]{10}" name="contact_no">
                                 <input type="number" class="mail_text" value="{{n}}"
                                     placeholder="Ratio of Nitrogen Content (0-100)" name="n">
                                 <input type="number" class="mail_text" value="{{p}}"
@@ -98,4 +98,54 @@
         </div>
     </div>
 </div>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    const csrftoken = getCookie('csrftoken');
+
+    document.getElementById("CropForm").addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        const data = Object.fromEntries(new FormData(this).entries());
+
+        fetch("/crop_api/", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": csrftoken
+            },
+            body: JSON.stringify(data)
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.error) {
+                alert("Error: " + data.error);
+            } else {
+                // better UX: wait for success
+                window.location.href = "/crop_report";
+            }
+        })
+        .catch(err => {
+            console.error("API Error:", err);
+            alert("Prediction failed! Check console.");
+        });
+    });
+
+});
+</script>
 {% endblock body %}
